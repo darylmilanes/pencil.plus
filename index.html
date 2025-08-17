@@ -1,0 +1,221 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>pencil.plus — Open-access communication training</title>
+<meta name="description" content="pencil.plus is a free, open-access communication training toolkit for schools, colleges, and professionals.">
+<link rel="icon" href="favicon.svg" type="image/svg+xml">
+<link rel="apple-touch-icon" href="logo.png">
+<meta name="theme-color" content="#006666" />
+
+<style>
+  :root{
+    --teal:#006666; --paper:#fafeff; --ink:#474747; --accent:#009999;
+    --contentW:min(1200px,92vw); --dock-height: 86px;
+  }
+  @font-face{font-family:"Croogla"; src:url("Croogla.woff2") format("woff2"); font-display:swap}
+
+  *{box-sizing:border-box}
+  html{scroll-behavior:smooth}
+  body{
+    margin:0;background:var(--paper);color:var(--ink);
+    font-family:"Croogla",system-ui,-apple-system,Segoe UI,Roboto,Arial; line-height:1.3;
+    padding-bottom: calc(var(--dock-height) + 16px + env(safe-area-inset-bottom));
+  }
+  a{color:var(--teal); text-decoration:none}
+  .container{width:var(--contentW); margin:0 auto; padding-inline:24px}
+
+  /* ===== Glass Header ===== */
+  header{
+    position:sticky; top:0; z-index:1000; overflow:hidden;
+    backdrop-filter: blur(15px) saturate(170%); -webkit-backdrop-filter: blur(15px) saturate(170%);
+    background: linear-gradient(180deg, rgba(250,254,255,0.5), rgba(250,254,255,0.5));
+    border-bottom:1px solid rgba(0,0,0,.05);
+    box-shadow: 0 12px 30px rgba(0,0,0,.05),
+                inset 0 1px 0 rgba(255,255,255,.5),
+                inset 0 -2px 6px rgba(0,0,0,0);
+    padding: calc(6px + env(safe-area-inset-top)) 0 6px;
+  }
+  .hdr-inner{width:var(--contentW); margin:0 auto; padding-inline:5px; display:flex; justify-content:center; align-items:center;}
+  .hdr-banner{
+    display:block; max-height:130px; width:auto; height:auto; object-fit:contain;
+    filter: drop-shadow(0 2px 8px rgba(0,0,0,.12));
+  }
+
+  /* ===== Sections & cards ===== */
+  section{ padding: clamp(36px,6vw,66px) 0; border-top:1px solid #fafeff; scroll-margin-top:130px}
+  .hero{ padding: clamp(44px,7vw,88px) 0 }
+  .hero h1{ color:var(--teal); margin:0 0 8px; font-size:clamp(2rem,4.5vw,3.1rem) }
+  .lead{ color:#5d5d5d }
+  h2{ color:var(--teal); margin:0 0 8px; font-size:clamp(1.5rem,3vw,2rem) }
+
+  .grid{ display:grid; gap:16px; grid-template-columns:repeat(auto-fit,minmax(240px,1fr)); margin-top:16px }
+
+  /* Card base */
+  .card{
+    background:rgba(255,255,255,.5);
+    border:2px solid var(--teal);
+    border-radius:25px;
+    padding:15px;
+    box-shadow: 0 8px 24px rgba(0,0,0,.04);
+    transition: background .25s ease, border-color .25s ease, color .25s ease, box-shadow .25s ease, transform .12s ease;
+  }
+  .card h3{ margin:0 0 6px; color:var(--ink); transition: color .25s ease }
+  .card p, .card a{ color:#5d5d5d; transition: color .25s ease }
+
+  /* Invert on hover/focus */
+  .card:hover, .card:focus-within{
+    background: var(--teal);
+    border-color: var(--teal);
+    box-shadow: 0 12px 28px rgba(0,0,0,.14);
+    transform: translateY(-1px);
+    color: var(--paper);
+  }
+  .card:hover h3, .card:focus-within h3,
+  .card:hover p,  .card:focus-within p,
+  .card:hover a,  .card:focus-within a{
+    color: var(--paper);
+  }
+
+  /* Buttons */
+  .cta{ display:flex; gap:12px; flex-wrap:wrap; margin-top:16px }
+  .btn{
+    display:inline-flex; align-items:center; gap:8px; background:var(--teal); color:#fff;
+    border:2px solid var(--teal); padding:12px 15px; border-radius:14px; font-weight:700;
+    transition: background .2s ease, border-color .2s ease
+  }
+  .btn:hover{ background:var(--accent); border-color:var(--accent) }
+  .btn.secondary{ background:transparent; color:var(--teal) }
+
+  footer{ padding:20px 20px; color:#6a6a6a; text-align:center; background:var(--paper) }
+
+  /* Bottom Dock */
+  .dock-wrap{
+    position:fixed; left:50%; bottom:calc(12px + env(safe-area-inset-bottom));
+    transform:translateX(-50%); z-index:1200; pointer-events:none;
+  }
+  .dock{
+    display:flex; gap:14px; align-items:center; justify-content:center;
+    padding:12px 14px; border-radius:40px; pointer-events:auto;
+    background:
+    radial-gradient(120% 160% at 25% 10%, rgba(255,255,255,.05), rgba(255,255,255,.05) 38%, rgba(255,255,255,0) 62%) padding-box,
+    linear-gradient(180deg, rgba(255,255,255,.05), rgba(255,255,255,.05)) padding-box,
+    rgba(0,102,102,.18); /* <- teal #006666 with ~20% opacity */;
+    border:1px solid rgba(255,255,255,.52);
+    box-shadow: 0 22px 44px rgba(0,0,0,.18),
+                inset 0 1px 0 rgba(255,255,255,.75),
+                inset 0 -4px 10px rgba(0,0,0,.12);
+    backdrop-filter: blur(20px) saturate(170%); -webkit-backdrop-filter: blur(20px) saturate(170%);
+  }
+  .dock-btn{
+    width:62px; height:62px; border-radius:50%; display:grid; place-items:center;
+    background: radial-gradient(100% 120% at 30% 18%, rgba(255,255,255,.26), rgba(255,255,255,0) 46%) padding-box, var(--teal);
+    color:#fff; box-shadow: inset 0 1px 1px rgba(255,255,255,.36), inset 0 -6px 12px rgba(0,0,0,.22);
+    border:none; text-decoration:none; transition: transform .12s ease, background .2s ease;
+  }
+  .dock-btn:active{ transform: scale(.965) }
+  .dock-btn:hover{ background: var(--accent); }
+  .dock-btn svg{ width:58%; height:58%; fill:#fff }
+  .dock-btn.is-active{
+    box-shadow: inset 0 1px 2px rgba(255,255,255,.45), inset 0 -7px 14px rgba(0,0,0,.28), 0 0 0 3px rgba(0,102,102,.20);
+  }
+  @media (max-width:420px){ .dock-btn{ width:40px; height:40px } }
+</style>
+</head>
+<body>
+
+<header>
+  <div class="hdr-inner">
+    <img src="header.png" alt="pencil.plus — People. Purpose. Practice. Progress." class="hdr-banner">
+  </div>
+</header>
+
+<main id="top">
+  <section class="hero">
+    <div class="container">
+      <h1>Open-access communication training for schools, colleges, and professionals.</h1>
+      <p class="lead">Free, facilitator-ready handouts and guides to strengthen speaking, listening, and collaboration. No logins, no fees, no subscriptions.</p>
+      <div class="cta">
+        <a class="btn" href="#toolkits">Explore Toolkits</a>
+        <a class="btn secondary" href="assessment.html">Try the Quick Assessment</a>
+      </div>
+    </div>
+  </section>
+
+  <section id="about">
+    <div class="container">
+      <h2>Why pencil.plus?</h2>
+      <p class="lead">We’re a free, open-access communication training toolkit built for real classrooms and teams. Our initiative grew from a simple belief: everyone deserves the chance to strengthen their voice, regardless of resources. By making these materials free, we aim to open opportunities for communities to practice communication that is both effective and respectful.
+<br><br>
+At pencil.plus, we emphasize People, Purpose, Practice, and Progress. That means valuing each person’s voice, encouraging purposeful use of language, creating practical tools for real-world practice, and supporting continuous progress in how we connect. Our goal is to help individuals and groups build habits of sensitivity, clarity, and collaboration — skills that uplift not just personal growth, but the communities we belong to.</p>
+    </div>
+  </section>
+
+  <section id="toolkits">
+    <div class="container">
+      <h2>Explore Our Toolkits</h2>
+      <div class="grid">
+        <article class="card"><h3>Voices 101</h3><p>Communication basics for students.</p></article>
+        <article class="card"><h3>SpeakUp</h3><p>Confidence and clarity in group speaking.</p></article>
+        <article class="card"><h3>CampusCom</h3><p>Belonging and connection on campus.</p></article>
+        <article class="card"><h3>ProTalk</h3><p>Practical communication for the workplace.</p></article>
+        <article class="card"><h3>Quiet Power</h3><p>Tools for reflective speakers and listeners.</p></article>
+        <article class="card"><h3>Beneath the Words</h3><p>Emotions, cues, and context.</p></article>
+        <article class="card"><h3>Friction Points</h3><p>Navigate disagreements with skill and care.</p></article>
+        <article class="card"><h3>Clinical Talk</h3><p>Scenario-based communication for health settings.</p></article>
+        <article class="card"><h3>Case &amp; Clause</h3><p>Reasoning and articulation for cases.</p></article>
+        <article class="card"><h3>Creative Sync</h3><p>Feedback and collaboration for creatives.</p></article>
+        <article class="card"><h3>Boardroom Flow</h3><p>Outcome-oriented executive communication.</p></article>
+        <article class="card"><h3>Tech Bridge</h3><p>Human-centered comms for technical teams.</p></article>
+      </div>
+    </div>
+  </section>
+
+  <section id="assessment">
+    <div class="container">
+      <h2>Quick Assessment</h2>
+      <p class="lead">Take a 10-question self-check on communication skills used across school, office, and cross-professional teamwork.</p>
+      <div class="cta">
+        <a class="btn" href="assessment.html">Start the Assessment</a>
+        <a class="btn secondary" href="#contact">Need help?</a>
+      </div>
+    </div>
+  </section>
+
+  <section id="contact">
+    <div class="container">
+      <h2>Connect With Us</h2>
+      <div class="grid">
+        <div class="card">✉️ <b>Email</b><br><a href="mailto:hello@pencil.plus">hello@pencil.plus</a></div>
+        <div class="card">👤 <b>Facebook</b><br><a href="https://www.facebook.com/pencil.plustoolkit/">facebook.com/pencil.plustoolkit</a></div>
+        <div class="card">💬 <b>Messenger</b><br><a href="https://m.me/pencil.plustoolkit">m.me/pencil.plustoolkit</a></div>
+      </div>
+    </div>
+  </section>
+</main>
+
+<footer>
+  <div class="container">© 2025 pencil.plus — Free, open-access communication training.</div>
+</footer>
+
+<!-- Bottom Dock -->
+<nav class="dock-wrap" aria-label="Quick navigation">
+  <div class="dock">
+    <a class="dock-btn" href="#about" aria-label="About">
+      <svg viewBox="0 0 24 24"><path d="M12 2a10 10 0 1 0 0 20 10 10 0 0 0 0-20Zm1 15h-2v-6h2v6Zm0-8h-2V7h2v2Z"/></svg>
+    </a>
+    <a class="dock-btn" href="#toolkits" aria-label="Toolkits">
+      <svg viewBox="0 0 24 24"><path d="M4 6h2v2H4V6Zm4 0h12v2H8V6Zm-4 5h2v2H4v-2Zm4 0h12v2H8v-2Zm-4 5h2v2H4v-2Zm4 0h12v2H8v-2Z"/></svg>
+    </a>
+    <a class="dock-btn" href="assessment.html" aria-label="Assessment">
+      <svg viewBox="0 0 24 24"><path d="M9 16.2 4.8 12l-1.4 1.4L9 19 21 7l-1.4-1.4z"/></svg>
+    </a>
+    <a class="dock-btn" href="#contact" aria-label="Contact">
+      <svg viewBox="0 0 24 24"><path d="M6.6 10.8a15.1 15.1 0 0 0 6.6 6.6l2.2-2.2c.3-.3.8-.4 1.2-.2 1.3.5 2.7.8 4.1.8.7 0 1.3.6 1.3 1.3V20c0 .7-.6 1.3-1.3 1.3C10.6 21.3 2.7 13.4 2.7 3.3 2.7 2.6 3.3 2 4 2h2.9c.7 0 1.3.6 1.3 1.3 0 1.4.3 2.8.8 4.1.1.4 0 .9-.3 1.2l-2.1 2.2Z"/></svg>
+    </a>
+  </div>
+</nav>
+
+</body>
+</html>
