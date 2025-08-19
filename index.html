@@ -135,9 +135,20 @@
   .dock-btn:active{ transform: scale(.965) }
   .dock-btn.is-active{ outline:3px solid rgba(255,184,0,.25) }
   .dock-arrow{ font-size:.9em; line-height:1; opacity:.85; }
+
+  /* ===== Keep dock horizontal on small screens (side-scroll if needed) ===== */
   @media (max-width:520px){
-    .dock{ gap:8px; flex-wrap:wrap }
-    .dock-btn{ padding:10px 12px; font-size:.9rem }
+    .dock{
+      gap:8px;
+      flex-wrap:nowrap;           /* force one row */
+      overflow-x:auto;            /* allow horizontal swipe */
+      max-width:92vw;
+      padding:10px 12px;
+      -webkit-overflow-scrolling:touch;
+    }
+    .dock > *{ flex:0 0 auto; }   /* no reflow/shrink */
+    .dock::-webkit-scrollbar{ display:none; } /* hide iOS/Chrome scrollbar */
+    .dock-btn{ padding:9px 12px; font-size:.9rem }
   }
 
   /* =============== Upward submenu (hover/focus to expand) =============== */
@@ -286,7 +297,7 @@
       <p class="lead">Browse additional resources, announcements, and ways to collaborate.</p>
       <div class="grid">
         <!-- Entire card is clickable with external links -->
-        <a class="card" href="https://about.pencil.plus" target="_blank" rel="noopener" aria-label="About">
+        <a class="card" href="https://about.pencil.plus" target="_blank" rel="noopener" aria-label="About the Initiative">
           <h3>About the Initiative</h3>
           <p>Learn the origins, goals, and how we keep it free.</p>
         </a>
@@ -328,11 +339,11 @@
 
     <!-- More group -->
     <div class="dock-group">
-      <a class="dock-btn" href="index.html?skipIntro=1#more" aria-haspopup="true" aria-expanded="false">
+      <a class="dock-btn" href="#more" aria-haspopup="true" aria-expanded="false">
         More <span class="dock-arrow" aria-hidden="true">▲</span>
       </a>
       <div class="dock-sub" role="menu" aria-label="More options">
-        <a role="menuitem" href="https://about.pencil.plus" target="_blank" rel="noopener">About</a>
+        <a role="menuitem" href="https://about.pencil.plus" target="_blank" rel="noopener">About the Initiative</a>
         <a role="menuitem" href="https://toolkit.pencil.plus" target="_blank" rel="noopener">Toolkit</a>
         <a role="menuitem" href="https://articles.pencil.plus" target="_blank" rel="noopener">Articles</a>
       </div>
@@ -428,6 +439,19 @@
         }
       } else {
         setActive(href); // normal nav for other pages
+      }
+    });
+  });
+
+  // Also smooth-scroll for submenu hash links (none now; keeping for future)
+  document.querySelectorAll('.dock-sub a[href^="#"]').forEach(a => {
+    a.addEventListener('click', (e) => {
+      const href = a.getAttribute('href');
+      const el = document.querySelector(href);
+      if (el){
+        e.preventDefault();
+        el.scrollIntoView({ behavior:'smooth', block:'start' });
+        setActive('#' + (href.replace('#','')));
       }
     });
   });
