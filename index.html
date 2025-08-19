@@ -16,20 +16,32 @@
 
 <style>
   :root{
+    /* Brand + layout */
     --main:#ffb800;
     --secondary:#f84051;
     --paper:#f5f5f7;
     --ink:#4a4a4a;
 
+    /* Final sticky header height */
     --headerH:150px;
+
+    /* Mobile-safe unit (set by JS) */
     --vh:1vh;
+
+    /* Smooth progress 0..1 for shrinking (set by JS) */
     --p:0;
 
+    /* Cover height mapping: 100vh -> headerH */
     --brandH: calc((1 - var(--p)) * (calc(var(--vh) * 100) - var(--headerH)) + var(--headerH));
+
+    /* Logo scaling */
     --logoMaxH: min(42vh, 52vmin);
     --logoMinH: calc(var(--headerH) - 24px);
 
+    /* Guaranteed distance below the sticky header */
     --gap: 100px;
+
+    /* How far you scroll after shrink before the hero fully arrives from bottom */
     --revealRunway: 16vh;
 
     --contentW:min(1200px,92vw);
@@ -46,22 +58,24 @@
   a{color:var(--secondary); text-decoration:none}
   .container{width:var(--contentW); margin:0 auto; padding-inline:24px}
 
-  /* Cover */
+  /* =================== FIXED shrinking cover (#4a4a4a) =================== */
   .cover{
     position:fixed; left:0; right:0; top:0; z-index:1000;
     height: var(--brandH);
     background:#4a4a4a; display:grid; place-items:center;
-    pointer-events:none;
+    pointer-events:none; /* cover never intercepts clicks */
   }
   .cover-logo{
     height: calc((1 - var(--p)) * var(--logoMaxH) + var(--p) * var(--logoMinH));
     width:auto; object-fit:contain; display:block; will-change:height;
   }
 
+  /* ========== Scroll gating so NOTHING shows until shrink completes ========== */
   .gate{ height: calc(calc(var(--vh) * 100) - var(--headerH)); }
   .header-spacer{ height: calc(var(--headerH) + var(--gap)); }
   .reveal-runway{ height: var(--revealRunway); }
 
+  /* ========================= Content & typography ========================= */
   section{ padding: clamp(36px,6vw,66px) 0; border-top:1px solid #f0f0f2; scroll-margin-top:calc(var(--headerH) + 12px) }
   .lead{ color:#5a5a5e; max-width:78ch }
   h1{ color:var(--ink); margin:0 0 10px; font-size:clamp(2rem,4.5vw,3.1rem); font-weight:800 }
@@ -69,6 +83,7 @@
 
   .grid{ display:grid; gap:16px; grid-template-columns:repeat(auto-fit,minmax(240px,1fr)); margin-top:16px }
 
+  /* ======= Card base (works for <div.card> and <a.card>) ======= */
   .card{
     background:#fff; border:2px solid var(--main); border-radius:25px; padding:15px;
     transition: background .25s ease, border-color .25s ease, color .25s ease, transform .12s ease, box-shadow .2s ease;
@@ -96,7 +111,7 @@
 
   footer{ padding:20px 20px; color:#6a6a6a; text-align:center; background:var(--paper) }
 
-  /* Dock */
+  /* =========================== Bottom word dock =========================== */
   .dock-wrap{
     position:fixed; left:50%; bottom:calc(12px + env(safe-area-inset-bottom));
     transform:translateX(-50%); z-index:1200; pointer-events:none;
@@ -107,7 +122,6 @@
     background: rgba(74,74,74,.35);
     border:1px solid rgba(255,255,255,.52);
     backdrop-filter: blur(20px) saturate(170%); -webkit-backdrop-filter: blur(20px) saturate(170%);
-    overflow: visible;
   }
   .dock-group{ position:relative; display:inline-flex; align-items:stretch; }
   .dock-btn{
@@ -122,29 +136,30 @@
   .dock-btn.is-active{ outline:3px solid rgba(255,184,0,.25) }
   .dock-arrow{ font-size:.9em; line-height:1; opacity:.85; }
 
-  /* balanced gutters with real spacers */
-  .dock-spacer{ width:12px; height:1px; flex:0 0 12px; }
-
+  /* ===== Keep dock horizontal on small screens + balanced inner gutters ===== */
   @media (max-width:520px){
     .dock{
       gap:8px;
-      flex-wrap:nowrap;
-      overflow-x:auto;
+      flex-wrap:nowrap;           /* force one row */
+      overflow-x:auto;            /* allow horizontal swipe */
       max-width:92vw;
-      padding:10px 16px;            /* inner padding */
+      padding:10px 16px;          /* a little more inner padding */
       -webkit-overflow-scrolling:touch;
-      scrollbar-width:none;
     }
-    .dock::-webkit-scrollbar{ display:none; }
-    .dock > *{ flex:0 0 auto; }
+    /* create equal left/right inner spacing so Home/More don't kiss the edges */
+    .dock::before, .dock::after{
+      content:""; flex:0 0 6px;
+    }
+    .dock > *{ flex:0 0 auto; }   /* no reflow/shrink */
+    .dock::-webkit-scrollbar{ display:none; } /* hide iOS/Chrome scrollbar */
     .dock-btn{ padding:9px 12px; font-size:.9rem }
   }
 
-  /* Submenus */
+  /* =============== Upward submenu (hover/focus OR JS 'open' class) =============== */
   .dock-sub{
     position:absolute; left:0; right:0; bottom:100%;
     display:flex; flex-direction:column; gap:8px;
-    padding-bottom:10px;
+    padding-bottom:10px; /* little gap from dock */
     transform: translateY(6px);
     opacity:0; pointer-events:none;
     transition: opacity .18s ease, transform .18s ease;
@@ -152,7 +167,7 @@
   }
   .dock-group:hover .dock-sub,
   .dock-group:focus-within .dock-sub,
-  .dock-group.open .dock-sub{
+  .dock-group.open .dock-sub{          /* <-- JS toggles .open for tap/click */
     opacity:1; transform: translateY(0); pointer-events:auto;
   }
   .dock-sub a{
@@ -166,7 +181,7 @@
     background:var(--main); color:#1e1e1e; border-color:var(--main); transform: translateY(-1px);
   }
 
-  /* Skip link etc */
+  /* ============================== Skip link ============================== */
   .skip-link{
     position:absolute; left:12px; top:-48px; z-index:2000;
     background:#ffffff; color:#000;
@@ -176,9 +191,12 @@
   }
   .skip-link:focus{ top:12px }
   @media (hover:none) and (pointer:coarse){ .skip-link{ top:-9999px } }
+
+  /* ======================= Remove unwanted red outline ===================== */
   :focus:not(:focus-visible){ outline:none; }
   #home:focus, #home:target{ outline:none; }
 
+  /* ===================== Skip-Intro (no shrink on return) ================== */
   .skip-intro{ --p:1; }
   .skip-intro .cover{ height: var(--headerH) !important; }
   .skip-intro .gate{ height: 0 !important; }
@@ -187,17 +205,25 @@
 </head>
 <body>
 
+<!-- Skip to content -->
 <a href="#home" class="skip-link">Skip to content</a>
 
+<!-- 1) FIXED shrinking cover -->
 <div class="cover" role="banner" aria-label="pencil.plus">
   <img src="header.png" alt="pencil.plus — People. Purpose. Practice. Progress." class="cover-logo">
 </div>
 
+<!-- 2) Scroll gate -->
 <div class="gate" aria-hidden="true"></div>
+
+<!-- 3) Spacer -->
 <div class="header-spacer" aria-hidden="true"></div>
+
+<!-- 4) Runway -->
 <div class="reveal-runway" aria-hidden="true"></div>
 
 <main>
+  <!-- Anchor is on the hero so Home shows the full hero -->
   <section id="home" class="hero" tabindex="-1">
     <div class="container">
       <h1>Open-access communication training for schools, colleges, and professionals.</h1>
@@ -225,7 +251,7 @@
     <div class="container">
       <h2>Explore Our Toolkit</h2>
       <div class="grid">
-        <!-- STATIC cards (non-clickable) -->
+        <!-- STATIC (non-clickable) cards -->
         <div class="card"><h3>Voices 101</h3><p>Communication basics for students.</p></div>
         <div class="card"><h3>SpeakUp</h3><p>Confidence and clarity in group speaking.</p></div>
         <div class="card"><h3>CampusCom</h3><p>Belonging and connection on campus.</p></div>
@@ -257,6 +283,7 @@
     <div class="container">
       <h2>Connect With Us</h2>
       <div class="grid">
+        <!-- Entire card is clickable -->
         <a class="card" id="email" href="mailto:hello@pencil.plus" target="_blank" rel="noopener" aria-label="Email hello@pencil.plus">
           <b>Email</b><br><span>hello@pencil.plus</span>
         </a>
@@ -275,8 +302,9 @@
       <h2>More</h2>
       <p class="lead">Browse additional resources, announcements, and ways to collaborate.</p>
       <div class="grid">
-        <a class="card" href="https://about.pencil.plus" target="_blank" rel="noopener" aria-label="About">
-          <h3>About</h3>
+        <!-- Entire card is clickable with external links -->
+        <a class="card" href="https://about.pencil.plus" target="_blank" rel="noopener" aria-label="About the Initiative">
+          <h3>About the Initiative</h3>
           <p>Learn the origins, goals, and how we keep it free.</p>
         </a>
         <a class="card" href="https://toolkit.pencil.plus" target="_blank" rel="noopener" aria-label="Toolkit">
@@ -296,17 +324,16 @@
   <div class="container">© 2025 pencil.plus — Free, open-access communication training.</div>
 </footer>
 
-<!-- Dock -->
+<!-- Bottom Dock with upward submenus -->
 <nav class="dock-wrap" aria-label="Quick navigation">
-  <div class="dock" id="dock">
-    <span class="dock-spacer" aria-hidden="true"></span>
-
+  <div class="dock">
     <a class="dock-btn" href="#home">Home</a>
 
     <a class="dock-btn" href="assessment.html">Assessment</a>
 
+    <!-- Connect group -->
     <div class="dock-group" data-group="connect">
-      <a class="dock-btn js-toggle" href="#contact" aria-haspopup="true" aria-expanded="false">
+      <a class="dock-btn" href="#contact" aria-haspopup="true" aria-expanded="false">
         Connect <span class="dock-arrow" aria-hidden="true">▲</span>
       </a>
       <div class="dock-sub" role="menu" aria-label="Connect options">
@@ -316,8 +343,9 @@
       </div>
     </div>
 
+    <!-- More group -->
     <div class="dock-group" data-group="more">
-      <a class="dock-btn js-toggle" href="#more" aria-haspopup="true" aria-expanded="false">
+      <a class="dock-btn" href="#more" aria-haspopup="true" aria-expanded="false">
         More <span class="dock-arrow" aria-hidden="true">▲</span>
       </a>
       <div class="dock-sub" role="menu" aria-label="More options">
@@ -326,32 +354,37 @@
         <a role="menuitem" href="https://articles.pencil.plus" target="_blank" rel="noopener">Articles</a>
       </div>
     </div>
-
-    <span class="dock-spacer" aria-hidden="true"></span>
   </div>
 </nav>
 
+<!-- Smooth shrink (p) + mobile-safe vh + dock scrollspy + robust skip-intro + tap-to-open menus -->
 <script>
 (function(){
   const root = document.documentElement;
 
+  // Helpers
   function setVH(){ root.style.setProperty('--vh', (window.innerHeight * 0.01) + 'px'); }
   function clamp01(x){ return Math.max(0, Math.min(1, x)); }
 
+  // Detect "skip intro" when coming from assessment.html OR via explicit flags
   const params = new URLSearchParams(location.search);
   const urlFlag = params.get('skipIntro') === '1' || /(^|[&#])noIntro\b/.test(location.hash);
   const fromAssessment = /assessment\.html(\?|#|$)/i.test(document.referrer || '');
   const SKIP_INTRO = urlFlag || fromAssessment;
 
+  // Apply skip-intro immediately and lock final state (no animation)
   function applySkipIntro() {
     document.body.classList.add('skip-intro');
-    root.style.setProperty('--p','1');
+    root.style.setProperty('--p','1'); // fully shrunk/sticky
+    // Ensure hero is at the top (below sticky header)
     const el = document.getElementById('home');
     if (el) { el.scrollIntoView({ block:'start' }); }
   }
 
+  // Initial viewport unit
   setVH(); window.addEventListener('resize', setVH);
 
+  // If skipping intro, do NOT start the shrink animation loop at all
   if (!SKIP_INTRO) {
     const getHeaderH = () => parseFloat(getComputedStyle(root).getPropertyValue('--headerH')) || 150;
     let targetP = 0, currentP = 0, denom = 1;
@@ -369,83 +402,71 @@
     window.addEventListener('resize', () => { recalc(); onScroll(); });
 
   } else {
+    // Lock to final state and ensure hero is visible immediately
     applySkipIntro();
+    // Also handle BFCache restores
     window.addEventListener('pageshow', () => applySkipIntro());
   }
 
+  // Skip link focus (focuses #home section)
   const home = document.getElementById('home');
   const skip = document.querySelector('.skip-link');
   if (skip && home){ skip.addEventListener('click', () => setTimeout(()=> home.focus(), 0)); }
 
-  // Smooth-scroll for top-level dock buttons linking to in-page anchors
-  const dock = document.getElementById('dock');
-  const topLinks = Array.from(dock.querySelectorAll('.dock-btn')).filter(a => !a.classList.contains('js-toggle'));
+  // Auto-active dock + no-hash smooth scroll to avoid :target outlines/history spam
+  const sections = [
+    { id: 'home',      href: '#home'      },
+    { id: 'assessment',href: 'assessment.html' },
+    { id: 'contact',   href: '#contact'   },
+    { id: 'more',      href: '#more'      },
+  ];
+  const dock = document.querySelector('.dock');
+  if (!dock) return;
+  const links = Array.from(dock.querySelectorAll('.dock-btn'));
+  const linkFor = (href) => links.find(a => a.getAttribute('href') === href);
   function setActive(href){
-    topLinks.forEach(a => {
+    links.forEach(a => {
       const on = a.getAttribute('href') === href;
       a.classList.toggle('is-active', on);
       if (on) a.setAttribute('aria-current','true'); else a.removeAttribute('aria-current');
     });
   }
-  topLinks.forEach(a => {
+
+  // Intercept in-page anchors so URL hash doesn't change (prevents :target outlines/history)
+  links.forEach(a => {
     a.addEventListener('click', (e) => {
       const href = a.getAttribute('href');
-      if (href && href.startsWith('#')){
+      if (href.startsWith('#')) {
         const el = document.querySelector(href);
-        if (el){
+        if (el) {
           e.preventDefault();
           el.scrollIntoView({ behavior:'smooth', block:'start' });
           setActive(href);
         }
+      } else {
+        setActive(href); // normal nav for other pages
       }
     });
   });
 
-  // Tap/click to open submenus (works on mobile). Also smooth-scroll to section.
-  function closeAllMenus(){
-    document.querySelectorAll('.dock-group.open').forEach(g => {
-      g.classList.remove('open');
-      const b=g.querySelector('.js-toggle'); if (b) b.setAttribute('aria-expanded','false');
-    });
-  }
-
-  document.querySelectorAll('.dock-group').forEach(group => {
-    const btn = group.querySelector('.js-toggle');
-    if (!btn) return;
-
-    btn.addEventListener('click', (e) => {
-      e.preventDefault();         // don't let the anchor instantly jump
-      e.stopPropagation();        // avoid outside-click handler closing it
-
-      const href = btn.getAttribute('href') || '';
-      if (href.startsWith('#')){
-        const el = document.querySelector(href);
-        if (el){ el.scrollIntoView({ behavior:'smooth', block:'start' }); setActive(href); }
-      }
-
-      const nowOpen = !group.classList.contains('open');
-      closeAllMenus();
-      if (nowOpen){
-        group.classList.add('open');
-        btn.setAttribute('aria-expanded','true');
+  // Also smooth-scroll for submenu hash links (none now; keeping for future)
+  document.querySelectorAll('.dock-sub a[href^="#"]').forEach(a => {
+    a.addEventListener('click', (e) => {
+      const href = a.getAttribute('href');
+      const el = document.querySelector(href);
+      if (el){
+        e.preventDefault();
+        el.scrollIntoView({ behavior:'smooth', block:'start' });
+        setActive('#' + (href.replace('#','')));
       }
     });
   });
 
-  // Close on outside click
-  document.addEventListener('click', () => closeAllMenus());
-  // Close on Esc
-  document.addEventListener('keydown', (e) => {
-    if (e.key === 'Escape') closeAllMenus();
-  });
-  // Close after following a submenu link
-  document.querySelectorAll('.dock-sub a').forEach(a => {
-    a.addEventListener('click', () => setTimeout(closeAllMenus, 0));
-  });
-
-  // IntersectionObserver to keep active link synced
-  const sections = ['home','contact','more'].map(id => document.getElementById(id)).filter(Boolean);
-  if (sections.length){
+  // IntersectionObserver keeps dock state in sync while scrolling
+  const targets = sections.filter(s => s.href.startsWith('#'))
+                          .map(s => ({...s, el: document.getElementById(s.id)}))
+                          .filter(s => s.el);
+  if (targets.length){
     let current = null;
     const io = new IntersectionObserver((entries) => {
       const vis = entries.filter(e => e.isIntersecting).sort((a,b)=>b.intersectionRatio-a.intersectionRatio);
@@ -454,9 +475,70 @@
         if (href !== current){ current = href; setActive(href); }
       }
     }, { root:null, rootMargin:'0px 0px -45% 0px', threshold:[0.2,0.4,0.6,0.8] });
-    sections.forEach(el => io.observe(el));
+    targets.forEach(t => io.observe(t.el));
   }
+
+  // ---------- Tap/click to open dock submenus (works on mobile) ----------
+  function setupDockToggles(){
+    document.querySelectorAll('.dock-group').forEach(group => {
+      const btn = group.querySelector('.dock-btn');
+      if (!btn) return;
+
+      btn.addEventListener('click', (e) => {
+        // If this is an in-page anchor (#contact/#more), scroll AND toggle menu
+        const href = btn.getAttribute('href') || '';
+        if (href.startsWith('#')) {
+          const el = document.querySelector(href);
+          if (el){
+            e.preventDefault();
+            el.scrollIntoView({ behavior:'smooth', block:'start' });
+            setActive(href);
+          }
+        }
+        // Toggle open state
+        const isOpen = group.classList.toggle('open');
+        btn.setAttribute('aria-expanded', String(isOpen));
+        // close others
+        document.querySelectorAll('.dock-group').forEach(g => {
+          if (g !== group){ g.classList.remove('open'); const b=g.querySelector('.dock-btn'); b&&b.setAttribute('aria-expanded','false'); }
+        });
+      });
+    });
+
+    // Close on outside click or Esc
+    document.addEventListener('click', (e) => {
+      const within = e.target.closest('.dock-group');
+      if (!within){
+        document.querySelectorAll('.dock-group').forEach(g => {
+          g.classList.remove('open');
+          const b=g.querySelector('.dock-btn'); b&&b.setAttribute('aria-expanded','false');
+        });
+      }
+    });
+    document.addEventListener('keydown', (e) => {
+      if (e.key === 'Escape'){
+        document.querySelectorAll('.dock-group').forEach(g => {
+          g.classList.remove('open');
+          const b=g.querySelector('.dock-btn'); b&&b.setAttribute('aria-expanded','false');
+        });
+      }
+    });
+    // Close when submenu link is followed
+    document.querySelectorAll('.dock-sub a').forEach(a => {
+      a.addEventListener('click', () => {
+        document.querySelectorAll('.dock-group').forEach(g => g.classList.remove('open'));
+      });
+    });
+  }
+  setupDockToggles();
+
+  // Default active on load
+  window.addEventListener('load', () => {
+    const hash = location.hash && linkFor(location.hash) ? location.hash : '#home';
+    setActive(hash);
+  });
 })();
 </script>
+
 </body>
 </html>
