@@ -16,10 +16,10 @@
 
 <style>
   :root{
-    --main:#ffb800;        /* brand primary */
-    --secondary:#f84051;   /* brand secondary */
-    --paper:#f5f5f7;       /* site background */
-    --ink:#4a4a4a;         /* body text */
+    --main:#ffb800;
+    --secondary:#f84051;
+    --paper:#f5f5f7;
+    --ink:#4a4a4a;
     --contentW:min(880px,92vw);
     --dock-height:86px;
   }
@@ -36,7 +36,6 @@
   a:hover{text-decoration:underline}
   .container{width:var(--contentW); margin:0 auto; padding-inline:24px}
 
-  /* Header (simple, opaque #4a4a4a) */
   header{
     position:sticky; top:0; z-index:1000; background:#4a4a4a;
     border-bottom:1px solid rgba(255,255,255,.08);
@@ -48,7 +47,6 @@
   main{padding:28px 0}
   h1{color:#232323; text-align:center; font-weight:800; letter-spacing:.2px}
 
-  /* Form container styled to brand */
   form{
     background:#fff;
     border:2px solid var(--main);
@@ -57,13 +55,11 @@
     box-shadow:0 6px 18px rgba(0,0,0,.04);
   }
 
-  /* Fieldset/legend semantics for accessibility */
   fieldset{border:0; padding:0; margin:0 0 22px}
   legend{font-weight:700; margin-bottom:10px; color:#232323}
   label{display:block; margin-bottom:8px}
   input[type="radio"]{ transform: translateY(1px); }
 
-  /* Buttons to secondary */
   button{
     background:var(--secondary); color:#fff; border:none; padding:12px 18px; border-radius:12px;
     font-weight:800; cursor:pointer; transition: transform .12s ease, background .2s ease;
@@ -71,7 +67,6 @@
   button:hover{ background:#ff5a67; transform: translateY(-1px) }
   button:active{ transform: scale(.98) }
 
-  /* Result styles tuned to new palette */
   .result{margin-top:24px; padding:16px; border-radius:14px; font-weight:700}
   .low{background:#ffe6ea; color:#a31225; border:1px solid #ffd0d6}
   .mid{background:#fff5da; color:#7a5a00; border:1px solid #ffe7ac}
@@ -79,7 +74,6 @@
 
   footer{padding:28px 0; text-align:center; color:#6a6a6a}
 
-  /* CTA links inside result box */
   .result a{
     color: var(--secondary);
     font-weight: 700;
@@ -94,7 +88,7 @@
     text-decoration:none;
   }
 
-  /* ========= Bottom Dock — with upward submenus ========= */
+  /* Dock */
   .dock-wrap{
     position:fixed; left:50%; bottom:calc(12px + env(safe-area-inset-bottom));
     transform:translateX(-50%); z-index:1200; pointer-events:none;
@@ -105,6 +99,7 @@
     background: rgba(74,74,74,.35);
     border:1px solid rgba(255,255,255,.52);
     backdrop-filter: blur(20px) saturate(170%); -webkit-backdrop-filter: blur(20px) saturate(170%);
+    overflow: visible;
   }
   .dock-group{ position:relative; display:inline-flex; align-items:stretch; }
   .dock-btn{
@@ -114,7 +109,6 @@
     transition: transform .12s ease, background .2s ease, color .2s ease;
     white-space:nowrap;
   }
-  /* Remove underline on hover for dock buttons only */
   .dock .dock-btn,
   .dock .dock-btn:hover,
   .dock .dock-btn:focus,
@@ -124,24 +118,23 @@
   .dock-btn.is-active{ outline:3px solid rgba(255,184,0,.25) }
   .dock-arrow{ font-size:.9em; line-height:1; opacity:.85; }
 
-  /* Keep dock horizontal on small screens (side-scroll + balanced gutters) */
+  .dock-spacer{ width:12px; height:1px; flex:0 0 12px; }
+
   @media (max-width:520px){
     .dock{
       gap:8px;
-      flex-wrap:nowrap;           /* force one row */
-      overflow-x:auto;            /* allow sideways swipe when tight */
+      flex-wrap:nowrap;
+      overflow-x:auto;
       max-width:92vw;
-      padding:10px 16px;          /* larger inner padding */
+      padding:10px 16px;
       -webkit-overflow-scrolling:touch;
+      scrollbar-width:none;
     }
-    /* equal inner spacing so Home/More don't touch edges */
-    .dock::before, .dock::after{ content:""; flex:0 0 6px; }
-    .dock > *{ flex:0 0 auto; }
     .dock::-webkit-scrollbar{ display:none; }
+    .dock > *{ flex:0 0 auto; }
     .dock-btn{ padding:9px 12px; font-size:.9rem }
   }
 
-  /* Upward submenu (hover/focus + JS 'open' class for tap) */
   .dock-sub{
     position:absolute; left:0; right:0; bottom:100%;
     display:flex; flex-direction:column; gap:8px;
@@ -172,7 +165,6 @@
 
 <header>
   <div class="hdr-inner">
-    <!-- Make banner a Home link that forces skip-intro on index -->
     <a href="index.html?skipIntro=1#home" aria-label="Back to Home">
       <img src="header.png" alt="pencil.plus — People. Purpose. Practice. Progress." class="hdr-banner">
     </a>
@@ -265,16 +257,16 @@
   <div class="container">© 2025 pencil.plus — Free, open-access communication training.</div>
 </footer>
 
-<!-- Bottom Dock — with upward submenus -->
 <nav class="dock-wrap" aria-label="Quick navigation">
-  <div class="dock">
+  <div class="dock" id="dock">
+    <span class="dock-spacer" aria-hidden="true"></span>
+
     <a class="dock-btn" href="index.html?skipIntro=1#home">Home</a>
 
     <a class="dock-btn is-active" href="assessment.html" aria-current="true">Assessment</a>
 
-    <!-- Connect group -->
     <div class="dock-group" data-group="connect">
-      <a class="dock-btn" href="index.html?skipIntro=1#contact" aria-haspopup="true" aria-expanded="false">
+      <a class="dock-btn js-toggle" href="index.html?skipIntro=1#contact" aria-haspopup="true" aria-expanded="false">
         Connect <span class="dock-arrow" aria-hidden="true">▲</span>
       </a>
       <div class="dock-sub" role="menu" aria-label="Connect options">
@@ -284,9 +276,8 @@
       </div>
     </div>
 
-    <!-- More group -->
     <div class="dock-group" data-group="more">
-      <a class="dock-btn" href="index.html?skipIntro=1#more" aria-haspopup="true" aria-expanded="false">
+      <a class="dock-btn js-toggle" href="index.html?skipIntro=1#more" aria-haspopup="true" aria-expanded="false">
         More <span class="dock-arrow" aria-hidden="true">▲</span>
       </a>
       <div class="dock-sub" role="menu" aria-label="More options">
@@ -295,6 +286,8 @@
         <a role="menuitem" href="https://articles.pencil.plus" target="_blank" rel="noopener">Articles</a>
       </div>
     </div>
+
+    <span class="dock-spacer" aria-hidden="true"></span>
   </div>
 </nav>
 
@@ -302,35 +295,26 @@
   // Quiz logic
   document.getElementById('quizForm').addEventListener('submit', function(e){
     e.preventDefault();
-
     const total = 10;
     let score = 0, answered = 0;
-
     for(let i=1;i<=total;i++){
       const sel = document.querySelector('input[name="q'+i+'"]:checked');
       if(sel){ answered++; score += parseInt(sel.value,10); }
     }
-
     const box = document.getElementById('resultBox');
     box.style.display = "block";
-
-    // If not all questions are answered, show warning
     if(answered < total){
       this.reportValidity && this.reportValidity();
       box.className = "result low";
       box.textContent = `⚠️ Please answer all ${total} questions before submitting. You still have ${total - answered} unanswered.`;
       return;
     }
-
-    // CTA links (ensure skipIntro when returning to index sections)
     const ctaLinks = `
       <div style="margin-top:12px;">
         <a href="index.html?skipIntro=1#toolkit">Explore Toolkit</a> • 
         <a href="mailto:hello@pencil.plus">Email Us</a> • 
         <a href="https://m.me/pencil.plustoolkit" target="_blank" rel="noopener">Messenger</a>
       </div>`;
-
-    // All answered → compute result + CTA
     if(score >= 26){
       box.className = "result high";
       box.innerHTML = `🌟 Excellent Communicator. You’re already demonstrating strong skills — well done! With pencil.plus, you can still sharpen your edge with advanced scenarios and cross-professional challenges (free of charge). ${ctaLinks}`;
@@ -341,56 +325,45 @@
       box.className = "result low";
       box.innerHTML = `🔎 Needs More Practice. You’re developing important skills and every step counts. With pencil.plus, you can get simple, structured tools to build confidence in communication (free of charge). ${ctaLinks}`;
     }
-
-    // Scroll results into view
     box.scrollIntoView({behavior:'smooth', block:'center'});
   });
 
-  // ----- Dock behavior: tap-to-open submenus (mobile friendly) -----
+  // Dock: tap/click open, outside/Esc close, balanced gutters
   (function(){
-    // Toggle open/close on button click
+    const dock = document.getElementById('dock');
+
+    function closeAll(){
+      document.querySelectorAll('.dock-group.open').forEach(g => {
+        g.classList.remove('open');
+        const b=g.querySelector('.js-toggle'); if (b) b.setAttribute('aria-expanded','false');
+      });
+    }
+
     document.querySelectorAll('.dock-group').forEach(group => {
-      const btn = group.querySelector('.dock-btn');
+      const btn = group.querySelector('.js-toggle');
       if (!btn) return;
+
       btn.addEventListener('click', (e) => {
+        e.preventDefault();
+        e.stopPropagation(); // keep outside-click handler from firing
+        // allow navigation to index anchor (don't navigate immediately; just open and the user can choose submenu or scroll)
         const href = btn.getAttribute('href') || '';
-        // Smooth-scroll if it's an in-page anchor on index
-        if (href.includes('#')) {
-          // allow normal navigation to index; don't preventDefault here
+        if (href.includes('#') && href.startsWith('index.html')){
+          // do nothing here; link remains if user long-presses/open-in-new-tab
         }
-        // Toggle the menu
-        const open = group.classList.toggle('open');
-        btn.setAttribute('aria-expanded', String(open));
-        // close siblings
-        document.querySelectorAll('.dock-group').forEach(g => {
-          if (g !== group){ g.classList.remove('open'); const b=g.querySelector('.dock-btn'); b&&b.setAttribute('aria-expanded','false'); }
-        });
+        const open = !group.classList.contains('open');
+        closeAll();
+        if (open){
+          group.classList.add('open');
+          btn.setAttribute('aria-expanded','true');
+        }
       });
     });
 
-    // Close on outside click or Esc
-    document.addEventListener('click', (e) => {
-      const within = e.target.closest('.dock-group');
-      if (!within){
-        document.querySelectorAll('.dock-group').forEach(g => {
-          g.classList.remove('open');
-          const b=g.querySelector('.dock-btn'); b&&b.setAttribute('aria-expanded','false');
-        });
-      }
-    });
-    document.addEventListener('keydown', (e) => {
-      if (e.key === 'Escape'){
-        document.querySelectorAll('.dock-group').forEach(g => {
-          g.classList.remove('open');
-          const b=g.querySelector('.dock-btn'); b&&b.setAttribute('aria-expanded','false');
-        });
-      }
-    });
-    // Close after choosing a submenu link
+    document.addEventListener('click', () => closeAll());
+    document.addEventListener('keydown', (e) => { if (e.key === 'Escape') closeAll(); });
     document.querySelectorAll('.dock-sub a').forEach(a => {
-      a.addEventListener('click', () => {
-        document.querySelectorAll('.dock-group').forEach(g => g.classList.remove('open'));
-      });
+      a.addEventListener('click', () => setTimeout(closeAll, 0));
     });
   })();
 </script>
