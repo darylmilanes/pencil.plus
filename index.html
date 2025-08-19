@@ -136,22 +136,26 @@
   .dock-btn.is-active{ outline:3px solid rgba(255,184,0,.25) }
   .dock-arrow{ font-size:.9em; line-height:1; opacity:.85; }
 
-  /* ===== Keep dock horizontal on small screens (side-scroll if needed) ===== */
+  /* ===== Keep dock horizontal on small screens + balanced inner gutters ===== */
   @media (max-width:520px){
     .dock{
       gap:8px;
       flex-wrap:nowrap;           /* force one row */
       overflow-x:auto;            /* allow horizontal swipe */
       max-width:92vw;
-      padding:10px 12px;
+      padding:10px 16px;          /* a little more inner padding */
       -webkit-overflow-scrolling:touch;
+    }
+    /* create equal left/right inner spacing so Home/More don't kiss the edges */
+    .dock::before, .dock::after{
+      content:""; flex:0 0 6px;
     }
     .dock > *{ flex:0 0 auto; }   /* no reflow/shrink */
     .dock::-webkit-scrollbar{ display:none; } /* hide iOS/Chrome scrollbar */
     .dock-btn{ padding:9px 12px; font-size:.9rem }
   }
 
-  /* =============== Upward submenu (hover/focus to expand) =============== */
+  /* =============== Upward submenu (hover/focus OR JS 'open' class) =============== */
   .dock-sub{
     position:absolute; left:0; right:0; bottom:100%;
     display:flex; flex-direction:column; gap:8px;
@@ -159,9 +163,11 @@
     transform: translateY(6px);
     opacity:0; pointer-events:none;
     transition: opacity .18s ease, transform .18s ease;
+    z-index:10;
   }
   .dock-group:hover .dock-sub,
-  .dock-group:focus-within .dock-sub{
+  .dock-group:focus-within .dock-sub,
+  .dock-group.open .dock-sub{          /* <-- JS toggles .open for tap/click */
     opacity:1; transform: translateY(0); pointer-events:auto;
   }
   .dock-sub a{
@@ -326,7 +332,7 @@
     <a class="dock-btn" href="assessment.html">Assessment</a>
 
     <!-- Connect group -->
-    <div class="dock-group">
+    <div class="dock-group" data-group="connect">
       <a class="dock-btn" href="#contact" aria-haspopup="true" aria-expanded="false">
         Connect <span class="dock-arrow" aria-hidden="true">▲</span>
       </a>
@@ -338,12 +344,12 @@
     </div>
 
     <!-- More group -->
-    <div class="dock-group">
+    <div class="dock-group" data-group="more">
       <a class="dock-btn" href="#more" aria-haspopup="true" aria-expanded="false">
         More <span class="dock-arrow" aria-hidden="true">▲</span>
       </a>
       <div class="dock-sub" role="menu" aria-label="More options">
-        <a role="menuitem" href="https://about.pencil.plus" target="_blank" rel="noopener">About the Initiative</a>
+        <a role="menuitem" href="https://about.pencil.plus" target="_blank" rel="noopener">About</a>
         <a role="menuitem" href="https://toolkit.pencil.plus" target="_blank" rel="noopener">Toolkit</a>
         <a role="menuitem" href="https://articles.pencil.plus" target="_blank" rel="noopener">Articles</a>
       </div>
@@ -351,7 +357,7 @@
   </div>
 </nav>
 
-<!-- Smooth shrink (p) + mobile-safe vh + dock scrollspy + robust skip-intro -->
+<!-- Smooth shrink (p) + mobile-safe vh + dock scrollspy + robust skip-intro + tap-to-open menus -->
 <script>
 (function(){
   const root = document.documentElement;
@@ -386,8 +392,8 @@
     function recalc(){ denom = Math.max(1, window.innerHeight - getHeaderH()); }
     function onScroll(){ targetP = clamp01((window.scrollY || 0) / denom); }
     function tick(){
-      currentP += (targetP - currentP) * 0.12;
-      if (Math.abs(targetP - currentP) < 0.0005) currentP = targetP;
+      const next = currentP + (targetP - currentP) * 0.12;
+      currentP = Math.abs(targetP - next) < 0.0005 ? targetP : next;
       root.style.setProperty('--p', currentP.toFixed(4));
       requestAnimationFrame(tick);
     }
@@ -471,6 +477,60 @@
     }, { root:null, rootMargin:'0px 0px -45% 0px', threshold:[0.2,0.4,0.6,0.8] });
     targets.forEach(t => io.observe(t.el));
   }
+
+  // ---------- Tap/click to open dock submenus (works on mobile) ----------
+  function setupDockToggles(){
+    document.querySelectorAll('.dock-group').forEach(group => {
+      const btn = group.querySelector('.dock-btn');
+      if (!btn) return;
+
+      btn.addEventListener('click', (e) => {
+        // If this is an in-page anchor (#contact/#more), scroll AND toggle menu
+        const href = btn.getAttribute('href') || '';
+        if (href.startsWith('#')) {
+          const el = document.querySelector(href);
+          if (el){
+            e.preventDefault();
+            el.scrollIntoView({ behavior:'smooth', block:'start' });
+            setActive(href);
+          }
+        }
+        // Toggle open state
+        const isOpen = group.classList.toggle('open');
+        btn.setAttribute('aria-expanded', String(isOpen));
+        // close others
+        document.querySelectorAll('.dock-group').forEach(g => {
+          if (g !== group){ g.classList.remove('open'); const b=g.querySelector('.dock-btn'); b&&b.setAttribute('aria-expanded','false'); }
+        });
+      });
+    });
+
+    // Close on outside click or Esc
+    document.addEventListener('click', (e) => {
+      const within = e.target.closest('.dock-group');
+      if (!within){
+        document.querySelectorAll('.dock-group').forEach(g => {
+          g.classList.remove('open');
+          const b=g.querySelector('.dock-btn'); b&&b.setAttribute('aria-expanded','false');
+        });
+      }
+    });
+    document.addEventListener('keydown', (e) => {
+      if (e.key === 'Escape'){
+        document.querySelectorAll('.dock-group').forEach(g => {
+          g.classList.remove('open');
+          const b=g.querySelector('.dock-btn'); b&&b.setAttribute('aria-expanded','false');
+        });
+      }
+    });
+    // Close when submenu link is followed
+    document.querySelectorAll('.dock-sub a').forEach(a => {
+      a.addEventListener('click', () => {
+        document.querySelectorAll('.dock-group').forEach(g => g.classList.remove('open'));
+      });
+    });
+  }
+  setupDockToggles();
 
   // Default active on load
   window.addEventListener('load', () => {
