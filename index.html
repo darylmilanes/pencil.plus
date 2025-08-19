@@ -542,3 +542,119 @@
 
 </body>
 </html>
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>pencil.plus — Open-access communication training</title>
+<meta name="description" content="pencil.plus is a free, open-access communication training toolkit for schools, colleges, and professionals.">
+<link rel="icon" href="favicon.svg" type="image/svg+xml">
+<link rel="apple-touch-icon" href="logo.png">
+<meta name="theme-color" content="#4a4a4a" />
+
+<!-- Inter font -->
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&display=swap" rel="stylesheet">
+
+<style>
+/* ... your existing CSS unchanged ... */
+</style>
+</head>
+<body>
+
+<!-- Skip to content -->
+<a href="#home" class="skip-link">Skip to content</a>
+
+<!-- Cover -->
+<div class="cover" role="banner" aria-label="pencil.plus">
+  <img src="header.png" alt="pencil.plus — People. Purpose. Practice. Progress." class="cover-logo">
+</div>
+
+<div class="gate" aria-hidden="true"></div>
+<div class="header-spacer" aria-hidden="true"></div>
+<div class="reveal-runway" aria-hidden="true"></div>
+
+<main>
+  <!-- ... all your main content unchanged ... -->
+</main>
+
+<footer>
+  <div class="container">© 2025 pencil.plus — Free, open-access communication training.</div>
+</footer>
+
+<!-- Bottom Dock -->
+<nav class="dock-wrap" aria-label="Quick navigation">
+  <div class="dock">
+    <a class="dock-btn" href="#home">Home</a>
+    <a class="dock-btn" href="assessment.html">Assessment</a>
+
+    <div class="dock-group" data-group="connect">
+      <a class="dock-btn" href="#contact" aria-haspopup="true" aria-expanded="false">
+        Connect <span class="dock-arrow">▲</span>
+      </a>
+      <div class="dock-sub">
+        <a href="mailto:hello@pencil.plus" target="_blank" rel="noopener">Email</a>
+        <a href="https://www.facebook.com/pencil.plustoolkit" target="_blank" rel="noopener">Facebook</a>
+        <a href="https://m.me/pencil.plustoolkit" target="_blank" rel="noopener">Messenger</a>
+      </div>
+    </div>
+
+    <div class="dock-group" data-group="more">
+      <a class="dock-btn" href="#more" aria-haspopup="true" aria-expanded="false">
+        More <span class="dock-arrow">▲</span>
+      </a>
+      <div class="dock-sub">
+        <a href="https://about.pencil.plus" target="_blank" rel="noopener">About</a>
+        <a href="https://toolkit.pencil.plus" target="_blank" rel="noopener">Toolkit</a>
+        <a href="https://articles.pencil.plus" target="_blank" rel="noopener">Articles</a>
+      </div>
+    </div>
+  </div>
+</nav>
+
+<!-- Existing dock script (unchanged) -->
+<script>
+(function(){
+  // ... all your current dock + shrink + scrollspy logic ...
+})();
+</script>
+
+<!-- Add-on script for mobile tweak -->
+<script>
+(function(){
+  const isMobile = /Mobi|Android/i.test(navigator.userAgent);
+  if (!isMobile) return;
+
+  document.querySelectorAll('.dock-group .dock-btn').forEach(btn => {
+    let lastTap = 0;
+    btn.addEventListener('click', (e) => {
+      const now = Date.now();
+      const group = btn.closest('.dock-group');
+
+      if (now - lastTap < 400) {
+        // Double-tap → follow link
+        return;
+      } else {
+        // Single-tap → expand submenu only
+        e.preventDefault();
+        group.classList.toggle('open');
+        btn.setAttribute('aria-expanded', String(group.classList.contains('open')));
+        // Close others
+        document.querySelectorAll('.dock-group').forEach(g => {
+          if (g !== group) {
+            g.classList.remove('open');
+            const b = g.querySelector('.dock-btn');
+            if (b) b.setAttribute('aria-expanded','false');
+          }
+        });
+      }
+      lastTap = now;
+    });
+  });
+})();
+</script>
+</body>
+</html>
