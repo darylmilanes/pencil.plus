@@ -106,9 +106,7 @@
     border:1px solid rgba(255,255,255,.52);
     backdrop-filter: blur(20px) saturate(170%); -webkit-backdrop-filter: blur(20px) saturate(170%);
   }
-  .dock-group{
-    position:relative; display:inline-flex; align-items:stretch;
-  }
+  .dock-group{ position:relative; display:inline-flex; align-items:stretch; }
   .dock-btn{
     font-weight:800; letter-spacing:.2px;
     padding:12px 16px; border-radius:20px; line-height:1;
@@ -126,32 +124,36 @@
   .dock-btn.is-active{ outline:3px solid rgba(255,184,0,.25) }
   .dock-arrow{ font-size:.9em; line-height:1; opacity:.85; }
 
-  /* Keep dock horizontal on small screens (side-scroll if needed) */
+  /* Keep dock horizontal on small screens (side-scroll + balanced gutters) */
   @media (max-width:520px){
     .dock{
       gap:8px;
       flex-wrap:nowrap;           /* force one row */
       overflow-x:auto;            /* allow sideways swipe when tight */
       max-width:92vw;
-      padding:10px 12px;
+      padding:10px 16px;          /* larger inner padding */
       -webkit-overflow-scrolling:touch;
     }
+    /* equal inner spacing so Home/More don't touch edges */
+    .dock::before, .dock::after{ content:""; flex:0 0 6px; }
     .dock > *{ flex:0 0 auto; }
     .dock::-webkit-scrollbar{ display:none; }
     .dock-btn{ padding:9px 12px; font-size:.9rem }
   }
 
-  /* Upward submenu */
+  /* Upward submenu (hover/focus + JS 'open' class for tap) */
   .dock-sub{
     position:absolute; left:0; right:0; bottom:100%;
     display:flex; flex-direction:column; gap:8px;
-    padding-bottom:10px; /* little gap from dock */
+    padding-bottom:10px;
     transform: translateY(6px);
     opacity:0; pointer-events:none;
     transition: opacity .18s ease, transform .18s ease;
+    z-index:10;
   }
   .dock-group:hover .dock-sub,
-  .dock-group:focus-within .dock-sub{
+  .dock-group:focus-within .dock-sub,
+  .dock-group.open .dock-sub{
     opacity:1; transform: translateY(0); pointer-events:auto;
   }
   .dock-sub a{
@@ -271,7 +273,7 @@
     <a class="dock-btn is-active" href="assessment.html" aria-current="true">Assessment</a>
 
     <!-- Connect group -->
-    <div class="dock-group">
+    <div class="dock-group" data-group="connect">
       <a class="dock-btn" href="index.html?skipIntro=1#contact" aria-haspopup="true" aria-expanded="false">
         Connect <span class="dock-arrow" aria-hidden="true">▲</span>
       </a>
@@ -283,7 +285,7 @@
     </div>
 
     <!-- More group -->
-    <div class="dock-group">
+    <div class="dock-group" data-group="more">
       <a class="dock-btn" href="index.html?skipIntro=1#more" aria-haspopup="true" aria-expanded="false">
         More <span class="dock-arrow" aria-hidden="true">▲</span>
       </a>
@@ -297,6 +299,7 @@
 </nav>
 
 <script>
+  // Quiz logic
   document.getElementById('quizForm').addEventListener('submit', function(e){
     e.preventDefault();
 
@@ -342,6 +345,54 @@
     // Scroll results into view
     box.scrollIntoView({behavior:'smooth', block:'center'});
   });
+
+  // ----- Dock behavior: tap-to-open submenus (mobile friendly) -----
+  (function(){
+    // Toggle open/close on button click
+    document.querySelectorAll('.dock-group').forEach(group => {
+      const btn = group.querySelector('.dock-btn');
+      if (!btn) return;
+      btn.addEventListener('click', (e) => {
+        const href = btn.getAttribute('href') || '';
+        // Smooth-scroll if it's an in-page anchor on index
+        if (href.includes('#')) {
+          // allow normal navigation to index; don't preventDefault here
+        }
+        // Toggle the menu
+        const open = group.classList.toggle('open');
+        btn.setAttribute('aria-expanded', String(open));
+        // close siblings
+        document.querySelectorAll('.dock-group').forEach(g => {
+          if (g !== group){ g.classList.remove('open'); const b=g.querySelector('.dock-btn'); b&&b.setAttribute('aria-expanded','false'); }
+        });
+      });
+    });
+
+    // Close on outside click or Esc
+    document.addEventListener('click', (e) => {
+      const within = e.target.closest('.dock-group');
+      if (!within){
+        document.querySelectorAll('.dock-group').forEach(g => {
+          g.classList.remove('open');
+          const b=g.querySelector('.dock-btn'); b&&b.setAttribute('aria-expanded','false');
+        });
+      }
+    });
+    document.addEventListener('keydown', (e) => {
+      if (e.key === 'Escape'){
+        document.querySelectorAll('.dock-group').forEach(g => {
+          g.classList.remove('open');
+          const b=g.querySelector('.dock-btn'); b&&b.setAttribute('aria-expanded','false');
+        });
+      }
+    });
+    // Close after choosing a submenu link
+    document.querySelectorAll('.dock-sub a').forEach(a => {
+      a.addEventListener('click', () => {
+        document.querySelectorAll('.dock-group').forEach(g => g.classList.remove('open'));
+      });
+    });
+  })();
 </script>
 </body>
 </html>
