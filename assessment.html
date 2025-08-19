@@ -125,9 +125,20 @@
   .dock-btn:active{ transform: scale(.965) }
   .dock-btn.is-active{ outline:3px solid rgba(255,184,0,.25) }
   .dock-arrow{ font-size:.9em; line-height:1; opacity:.85; }
+
+  /* Keep dock horizontal on small screens (side-scroll if needed) */
   @media (max-width:520px){
-    .dock{ gap:8px; flex-wrap:wrap }
-    .dock-btn{ padding:10px 12px; font-size:.9rem }
+    .dock{
+      gap:8px;
+      flex-wrap:nowrap;           /* force one row */
+      overflow-x:auto;            /* allow sideways swipe when tight */
+      max-width:92vw;
+      padding:10px 12px;
+      -webkit-overflow-scrolling:touch;
+    }
+    .dock > *{ flex:0 0 auto; }
+    .dock::-webkit-scrollbar{ display:none; }
+    .dock-btn{ padding:9px 12px; font-size:.9rem }
   }
 
   /* Upward submenu */
@@ -277,7 +288,7 @@
         More <span class="dock-arrow" aria-hidden="true">▲</span>
       </a>
       <div class="dock-sub" role="menu" aria-label="More options">
-        <a role="menuitem" href="https://about.pencil.plus" target="_blank" rel="noopener">About</a>
+        <a role="menuitem" href="https://about.pencil.plus" target="_blank" rel="noopener">About the Initiative</a>
         <a role="menuitem" href="https://toolkit.pencil.plus" target="_blank" rel="noopener">Toolkit</a>
         <a role="menuitem" href="https://articles.pencil.plus" target="_blank" rel="noopener">Articles</a>
       </div>
