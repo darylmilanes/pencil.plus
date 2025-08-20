@@ -58,16 +58,26 @@
   a{color:var(--secondary); text-decoration:none}
   .container{width:var(--contentW); margin:0 auto; padding-inline:24px}
 
-  /* =================== FIXED shrinking cover (#4a4a4a) =================== */
+  /* =================== FIXED shrinking cover (glass-tinted) =================== */
   .cover{
     position:fixed; left:0; right:0; top:0; z-index:1000;
     height: var(--brandH);
-    background:#4a4a4a; display:grid; place-items:center;
+    display:grid; place-items:center;
     pointer-events:none;
+  }
+  .cover-glass{
+    position:absolute; inset:0;
+    background: rgba(74,74,74,0.60);              /* #4a4a4a with transparency */
+    -webkit-backdrop-filter: blur(30px) saturate(170%);
+    backdrop-filter: blur(30px) saturate(170%);
+    border-bottom: 2px solid rgba(255, 255, 255, 0.18);
+    box-shadow: 0 0 30px rgba(227, 228, 237, 0.37);
+    z-index:0;                                     /* stays behind */
   }
   .cover-logo{
     height: calc((1 - var(--p)) * var(--logoMaxH) + var(--p) * var(--logoMinH));
     width:auto; object-fit:contain; display:block; will-change:height;
+    position:relative; z-index:1;                  /* crisp, above blur */
   }
 
   /* ========== Scroll gating so NOTHING shows until shrink completes ========== */
@@ -111,15 +121,20 @@
 
   footer{ padding:20px 20px; color:#6a6a6a; text-align:center; background:var(--paper) }
 
-  /* =========================== Bottom Tab Bar =========================== */
+  /* =========================== Bottom Tab Bar (GLASS) =========================== */
   .tabbar{
     position:fixed; left:0; right:0; bottom:0; z-index:1200;
     height: calc(var(--tabbar-h) + env(safe-area-inset-bottom));
     padding-bottom: env(safe-area-inset-bottom);
-    background: rgba(74,74,74,.35);
-    border-top:1px solid rgba(255,255,255,.52);
-    backdrop-filter: blur(20px) saturate(170%);
-    -webkit-backdrop-filter: blur(20px) saturate(170%);
+
+    /* Glass look */
+    background: rgba(255,255,255,0.15);
+    -webkit-backdrop-filter: blur(30px);
+    backdrop-filter: blur(30px);
+
+    /* Requested effects */
+    box-shadow: 0 0 30px rgba(227, 228, 237, 0.37);
+    border: 2px solid rgba(255, 255, 255, 0.18);
   }
   .tabbar-inner{
     height:var(--tabbar-h);
@@ -150,6 +165,27 @@
     .tabbar-inner{ max-width: 820px; }
   }
 
+  /* Optional: soften glass edge on larger screens */
+  @media (min-width: 480px){
+    .tabbar{ border-top-left-radius: 16px; border-top-right-radius: 16px; }
+  }
+
+  /* Accessibility/perf fallback if transparency is reduced by user/OS */
+  @media (prefers-reduced-transparency: reduce){
+    .cover-glass{
+      background:#4a4a4a;
+      -webkit-backdrop-filter:none; backdrop-filter:none;
+      box-shadow:none; border-bottom:1px solid rgba(255,255,255,0.22);
+    }
+    .tabbar{
+      background: rgba(74,74,74,0.85);
+      -webkit-backdrop-filter: none;
+      backdrop-filter: none;
+      box-shadow: none;
+      border: 1px solid rgba(255,255,255,0.25);
+    }
+  }
+
   /* ============================== Skip link ============================== */
   .skip-link{
     position:absolute; left:12px; top:-48px; z-index:2000;
@@ -161,7 +197,7 @@
   .skip-link:focus{ top:12px }
   @media (hover:none) and (pointer:coarse){ .skip-link{ top:-9999px } }
 
-  /* ===================== Remove unwanted red outline ===================== */
+  /* ===================== Remove unwanted outlines ===================== */
   :focus:not(:focus-visible){ outline:none; }
   #home:focus, #home:target{ outline:none; }
 
@@ -179,6 +215,7 @@
 
 <!-- 1) FIXED shrinking cover -->
 <div class="cover" role="banner" aria-label="pencil.plus">
+  <div class="cover-glass" aria-hidden="true"></div>
   <img src="header.png" alt="pencil.plus — People. Purpose. Practice. Progress." class="cover-logo">
 </div>
 
@@ -326,7 +363,7 @@
   function clamp01(x){ return Math.max(0, Math.min(1, x)); }
   setVH(); window.addEventListener('resize', setVH);
 
-  // Detect skip-intro (same behavior as before)
+  // Detect skip-intro
   const params = new URLSearchParams(location.search);
   const urlFlag = params.get('skipIntro') === '1' || /(^|[&#])noIntro\b/.test(location.hash);
   const fromAssessment = /assessment\.html(\?|#|$)/i.test(document.referrer || '');
@@ -360,12 +397,6 @@
   }
 
   // Tab active state while scrolling
-  const tabs = {
-    '#home': document.getElementById('tab-home'),
-    '#contact': document.getElementById('tab-connect'),
-    '#more': document.getElementById('tab-more')
-  };
-
   function setActive(href){
     document.querySelectorAll('.tabbar .tab').forEach(a=>{
       const on = a.getAttribute('href') === href;
