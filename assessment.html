@@ -2,7 +2,8 @@
 <html lang="en">
 <head>
 <meta charset="utf-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1" />
+<!-- Edge-to-edge on iOS so the sticky header and tab bar respect the notch -->
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
 <title>pencil.plus — Quick Assessment</title>
 <meta name="description" content="Self-check your communication skills with pencil.plus free assessment.">
 <link rel="icon" href="favicon.svg" type="image/svg+xml">
@@ -30,6 +31,7 @@
     margin:0; background:var(--paper); color:var(--ink);
     font-family:"Inter",system-ui,-apple-system,Segoe UI,Roboto,Arial;
     line-height:1.55;
+    /* keep content above the glass tab bar and the iOS home indicator */
     padding-bottom: calc(var(--tabbar-h) + 16px + env(safe-area-inset-bottom));
   }
   a{color:var(--secondary); text-decoration:none}
@@ -39,11 +41,14 @@
   /* ===================== GLASS HEADER (crisp logo above blur) ===================== */
   header{
     position:sticky; top:0; z-index:1000; isolation:isolate;
+    /* pin during Safari URL-bar collapse */
+    -webkit-transform: translateZ(0); transform: translateZ(0);
   }
   .hdr-inner{
     position:relative;
     width:100%;
     display:flex; justify-content:center; align-items:center;
+    /* respect the iOS notch */
     padding: calc(8px + env(safe-area-inset-top)) 0 8px;
   }
   .hdr-glass{
@@ -58,7 +63,7 @@
   .hdr-banner{
     display:block; max-height:150px; width:auto; object-fit:contain;
     position:relative; z-index:1;                 /* keep sharp above blur */
-    filter:none;
+    filter:none; background:transparent !important;
   }
 
   main{padding:28px 0}
@@ -369,7 +374,7 @@
       <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M9 3h6a2 2 0 0 1 2 2h2a1 1 0 0 1 1 1v13a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a1 1 0 0 1 1-1h2a2 2 0 0 1 2-2Zm0 2v1h6V5H9Zm2.9 9.9 4.6-4.6-1.4-1.4-3.2 3.2-1.6-1.6-1.4 1.4 3 3Z"/></svg>
       <span>Assessment</span>
     </a>
-    <!-- FIXED: these point to index with correct anchors -->
+    <!-- One-click to anchored sections on index -->
     <a class="tab" href="index.html?skipIntro=1#contact" id="tab-connect" aria-label="Connect">
       <!-- chat icon -->
       <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 4h16a2 2 0 0 1 2 2v8a2 2 0 0 1-2 2H9l-5 4v-4H4a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2Z"/></svg>
