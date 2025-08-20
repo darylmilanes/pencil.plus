@@ -363,7 +363,7 @@
   function clamp01(x){ return Math.max(0, Math.min(1, x)); }
   setVH(); window.addEventListener('resize', setVH);
 
-  // Detect skip-intro
+  // Detect skip-intro (and respect incoming hash)
   const params = new URLSearchParams(location.search);
   const urlFlag = params.get('skipIntro') === '1' || /(^|[&#])noIntro\b/.test(location.hash);
   const fromAssessment = /assessment\.html(\?|#|$)/i.test(document.referrer || '');
@@ -372,8 +372,10 @@
   function applySkipIntro() {
     document.body.classList.add('skip-intro');
     root.style.setProperty('--p','1');
-    const el = document.getElementById('home');
-    if (el) { el.scrollIntoView({ block:'start' }); }
+    const target = (location.hash && document.querySelector(location.hash))
+      ? document.querySelector(location.hash)
+      : document.getElementById('home');
+    if (target) { target.scrollIntoView({ block:'start' }); }
   }
 
   if (!SKIP_INTRO) {
@@ -431,11 +433,10 @@
     targets.forEach(el=>io.observe(el));
   }
 
-  // Default active on load
+  // Initial active tab respects current hash
   window.addEventListener('load', ()=>{
-    setActive('#home');
+    setActive(location.hash || '#home');
   });
-
 })();
 </script>
 
