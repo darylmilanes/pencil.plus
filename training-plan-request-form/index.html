@@ -1,1 +1,194 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+  <title>pencil.plus — Training Plan Request</title>
+  <meta name="description" content="Request a free, facilitator-ready communication training plan from pencil.plus.">
+  <link rel="icon" href="favicon.svg" type="image/svg+xml">
+  <link rel="apple-touch-icon" href="logo.png">
+  <meta name="theme-color" content="#4a4a4a" />
+
+  <!-- Inter font -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&display=swap" rel="stylesheet">
+
+  <!-- Styles -->
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+
+<main>
+  <div class="container" id="top">
+    <h1>Request Your Free Communication Training Plan</h1>
+    <p style="text-align:center; margin-bottom:20px; font-weight:500;">
+      Welcome to pencil.plus! We’re glad you’re interested in our <strong>facilitator-ready training plans</strong>.
+      Once you complete this form, we’ll tailor a plan and send it directly to your email.  
+      You can then run it internally with your chosen facilitator.
+    </p>
+
+  <form id="requestForm" action="https://formspree.io/f/mandvywz" method="POST" novalidate>
+
+      <!-- Requestor Information -->
+      <fieldset>
+        <legend>Requestor Information</legend>
+        <div class="form-grid">
+          <label for="req-name">Full name</label>
+          <input id="req-name" type="text" name="requestor_name" required autocomplete="name" />
+
+          <label for="req-email">Email (plan will be sent here)</label>
+          <input id="req-email" type="email" name="requestor_email" required autocomplete="email" />
+
+          <label for="req-org">Organization / School</label>
+          <input id="req-org" type="text" name="requestor_org" required />
+
+          <label for="req-role">Your Role / Position</label>
+          <input id="req-role" type="text" name="requestor_role" required />
+        </div>
+      </fieldset>
+
+      <!-- Intended Participants -->
+      <fieldset>
+        <legend>Intended Participants</legend>
+        <div class="form-grid">
+          <label for="group-type">Group type</label>
+          <select id="group-type" name="participants_group" required>
+            <option value="">Select...</option>
+            <option>Secondary school students</option>
+            <option>College / university students</option>
+            <option>Working professionals</option>
+            <option>Other</option>
+          </select>
+          <input id="group-type-other" type="text" name="participants_group_other"
+                 placeholder="Please specify" class="full-row other-input" style="display:none;" />
+
+          <label for="group-size">Approximate group size</label>
+          <select id="group-size" name="participants_size" required>
+            <option value="">Select...</option>
+            <option>Fewer than 20</option>
+            <option>20–50</option>
+            <option>50–100</option>
+            <option>100+</option>
+          </select>
+
+          <label for="age-range">Age range</label>
+          <select id="age-range" name="participants_age" required>
+            <option value="">Select...</option>
+            <option>Under 18</option>
+            <option>18–24</option>
+            <option>25–34</option>
+            <option>35–44</option>
+            <option>45+</option>
+          </select>
+
+          <label for="languages">Primary language(s)</label>
+          <input id="languages" type="text" name="participants_languages" required />
+        </div>
+      </fieldset>
+
+      <!-- Training Goals -->
+      <fieldset>
+        <legend>Training Context & Goals</legend>
+        <div class="form-grid">
+          <label for="goals">Main reason for training</label>
+          <select id="goals" name="training_goals" required>
+            <option value="">Select...</option>
+            <option>Boosting confidence in speaking</option>
+            <option>Improving presentation skills</option>
+            <option>Enhancing teamwork and collaboration</option>
+            <option>Preparing for workplace communication</option>
+            <option>Strengthening persuasive / pitching skills</option>
+            <option>Other</option>
+          </select>
+          <input id="goals-other" type="text" name="training_goals_other"
+                 placeholder="Please specify" class="full-row other-input" style="display:none;" />
+
+          <label for="challenges">Specific communication challenges</label>
+          <textarea id="challenges" name="training_challenges" rows="3"></textarea>
+
+          <label for="outcomes">Desired outcomes</label>
+          <textarea id="outcomes" name="training_outcomes" rows="3"></textarea>
+        </div>
+      </fieldset>
+
+      <!-- Implementation Details -->
+      <fieldset>
+        <legend>Implementation Details</legend>
+        <div class="form-grid">
+          <label for="facilitator">Who will facilitate?</label>
+          <select id="facilitator" name="facilitator_type" required>
+            <option value="">Select...</option>
+            <option>Teacher / Educator</option>
+            <option>HR / Training Officer</option>
+            <option>Team Leader / Manager</option>
+            <option>Other</option>
+          </select>
+          <input id="facilitator-other" type="text" name="facilitator_other"
+                 placeholder="Please specify" class="full-row other-input" style="display:none;" />
+
+          <label for="time">Time allocated</label>
+          <select id="time" name="training_time" required>
+            <option value="">Select...</option>
+            <option>1–2 hours total</option>
+            <option>3–5 hours total</option>
+            <option>Full-day session</option>
+            <option>Multi-day program</option>
+          </select>
+
+          <label for="structure">Preferred structure</label>
+          <select id="structure" name="training_structure" required>
+            <option value="">Select...</option>
+            <option>Single workshop session</option>
+            <option>Series of short sessions</option>
+            <option>Flexible / modular activities</option>
+          </select>
+        </div>
+      </fieldset>
+
+      <!-- Additional Notes -->
+      <fieldset>
+        <legend>Additional Notes</legend>
+        <div class="form-grid">
+          <label for="notes">Anything else we should know?</label>
+          <textarea id="notes" name="additional_notes" rows="3"></textarea>
+        </div>
+      </fieldset>
+
+      <!-- Consent -->
+      <fieldset>
+        <div class="form-grid">
+          <div class="full-row consent">
+            <input id="consent" type="checkbox" name="consent" value="yes" required />
+            <label for="consent" style="font-weight:500; margin:0;">
+              I agree to be contacted about pencil.plus resources and understand my responses will be stored.
+            </label>
+          </div>
+        </div>
+      </fieldset>
+
+      <!-- Hidden fields -->
+      <input type="hidden" name="_subject" value="pencil.plus Training Plan Request" />
+      <input type="hidden" name="page_url" id="page_url" />
+      <input type="hidden" name="user_agent" id="user_agent" />
+      <input type="hidden" name="time_to_submit_ms" id="time_to_submit_ms" />
+
+      <!-- Honeypot -->
+      <input type="text" name="_gotcha" tabindex="-1" autocomplete="off"
+             style="position:absolute; left:-9999px; width:1px; height:1px; opacity:0;" />
+
+      <button type="submit">Submit Request</button>
+    </form>
+
+    <div id="submitStatus" class="result" style="display:none; margin-top:12px;" aria-live="polite"></div>
+  </div>
+</main>
+
+<footer>
+  <div class="container">© 2025 pencil.plus — Free, facilitator-ready communication training plans.</div>
+</footer>
+
+<script src="script.js"></script>
+</body>
+</html>
 
